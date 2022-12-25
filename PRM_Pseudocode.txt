@@ -1,0 +1,298 @@
+#GCE OLEVEL 2210 PRM 2022 SOLUTION
+#PSEUDOCODE
+
+FUNCTION CalculateFamilyPrice(adults : int, children : int, seniors : int, dayType : int)   RETURN rate int
+
+    #DECLARATION
+    DECLARE ticketCount :   int
+    DECLARE rate        :   int
+    DECLARE ret_value[2]:   int
+    DECLARE guardians   :   int
+    DECLARE ineligible  :   bool
+    
+    #INITIALIZATION
+    ticketCount <- 0
+    rate <- 9999999 # AS BIG AS POSSIBLE
+    ret_value[0] <- 0
+    ret_value[1] <- 0
+    guardians <- adults + seniors
+    ineligible <- False
+
+    WHILE (guardians > 0 AND children > 0)
+        ticketCount <- ticketCount + 1
+        guardians   <- guardians - 2
+        children    <- children - 3
+
+        if (children <= 0 AND guardians > 0):
+            ineligible <- True
+    END WHILE
+   
+    IF (ineligible == False):   
+        IF (dayType == 1)
+            THEN    rate <- ticketCount * 60
+            ELSE    rate <- ticketCount * 90
+        END IF
+    ELSE
+        ticketCount <- 0
+
+    ret_value[0] <- rate
+    ret_value [1] <- ticketCount
+    RETURN ret_value
+
+END FUNCTION    
+
+
+FUNCTION CalculateGroupPrice (adults : int, children : int, seniors : int, dayType : int)   RETURN rate int
+    #DECLARATION
+    DECLARE rate        :   int
+    DECLARE people      :   int
+
+    #INITIALIZATION    
+    rate <- 9999999 # AS BIG AS POSSIBLE
+    people <- adults + seniors + children 
+
+    IF (people >= 6)
+        IF (dayType == 1)
+            THEN    rate <- people * 15
+            ELSE    rate <- people * 22.5
+        END IF
+    END IF
+
+    RETURN rate
+
+END FUNCTION
+
+#END OF TASK 3 FUNCTIONS
+#--------------------------------------------------------------------------------------------------
+
+#TASK 1
+DECLARE ticket_type [5] : string
+ticket_type = ["One Adult",
+               "One Child",
+               "One Senior", 
+               "Family Ticket",
+               "Group Ticket(Per Person)"]
+
+DECLARE cost_one_day [5] : float
+cost_one_day = [20,12,16,60,15]
+
+DECLARE cost_two_day [5] : float
+cost_two_day = [30,18,24,90,22.5]
+
+DECLARE extra_attracts [3] : string
+extra_attracts = [  "Lion feeding",
+                    "Penguin feeding", 
+                    "Evening barbecue (Two-Day Tickets Only)"]
+
+DECLARE att_cost [3] : float
+att_cost = [2.5,2,5]
+
+DECLARE valid_days[7]: int
+DECLARE day      :   int
+DECLARE startday :   int
+DECLARE endday   :   int
+
+valid_days <- [0,0,0,0,0,0,0]
+
+#ONE DAY DETAILS
+PRINT "TICKET PRICE FOR ONE-DAY:"
+FOR i <- 0 TO Length(ticket_type)
+    PRINT(ticket_type[i],": $%.2f"% cost_one_day[i])
+NEXT
+
+#TWO DAY DETAILS
+PRINT("\nTICKET PRICE FOR TWO-DAY:")
+FOR i <- 0 TO Length(ticket_type)
+    PRINT(ticket_type[i],": $%.2f"% cost_two_day[i])
+NEXT
+
+#EXTRA ATTRACTIONS    
+PRINT("\nEXTRA ATTRACTION PRICE:")
+FOR i <- 0 TO Length(extra_attracts):
+    PRINT(extra_attracts[i], att_cost[i])
+NEXT
+    
+#VALID DAYS
+INPUT day "(1-31)"
+WHILE (day < 1 OR day > 31):    #VALIDATION CHECK ON DATE
+    INPUT day "(1-31)"
+END WHILE
+
+startday <- day
+valid_days[0] <- startday 
+
+FOR i <- 1 To 7:    #7 days in week excluding 0
+    IF(day == 31):  #checking IF the end of the day
+        day <- 0     #set the day back to 0 as new month has started
+    END IF
+
+    day <- day + 1   #incrementing the days
+    valid_days[i] <- day
+NEXT
+
+PRINT("\nTickets are available FOR the following days: ")
+PRINT(valid_days)
+
+INPUT bookingday
+WHILE(True): #Validation Check on Day
+    IF(bookingday NOT Present in valid_days)
+        THEN    INPUT bookingday
+        ELSE BREAK
+    END IF 
+END WHILE
+
+#END OF TASK 1
+#--------------------------------------------------------------------------------------------------                 
+
+#--------------------------------------------------------------------------------------------------
+#TASK 2
+
+#DECLARATION
+DECLARE booking_no         : int
+DECLARE choice_no          : int
+DECLARE adult,child,senior : int
+DECLARE ticket_price       : float
+DECLARE attraction_price   : float
+DECLARE booking_choice     : string
+DECLARE extra_choice       : string
+DECLARE attractions[3]     : int  #lion,penguin,bbq
+DECLARE tickets [3]        : int
+
+INPUT booking_choice
+WHILE (booking_choice == 'Y' OR booking_choice == 'y'): #Validation check on Y or N
+    booking_no = booking_no + 1
+    
+    attractions <- [0,0,0] #lion,penguin,bbq
+    adult <- 0
+    child <- 0
+    senior <- 0
+
+    WHILE(TRUE):
+        INPUT day_choice ("Press 1 FOR 1-Day Booking Press 2 FOR 2-Day Booking)
+        IF(day_choice == 1 OR day_choice == 2): #Validation Check on day choice
+            BREAK
+    END WHILE
+
+    INPUT adult
+    INPUT child 
+    INPUT senior 
+    
+    WHILE(child / (adult+senior) > 2):  #Validation Check on Children and Adults
+        PRINT("Error: Only 2 children per adult allowed")
+        INPUT adult
+        INPUT child 
+        INPUT senior
+    END WHILE
+    
+    tickets <- [adult, child, senior]
+    
+    INPUT extra_choice ("Do you want Extra Attractions? Y/N")
+    WHILE(extra_choice == 'Y' or extra_choice == 'y') #Validation Check
+        PRINT('Press 1 FOR Lion Feeding')
+        PRINT('Press 2 FOR Penguin Feeding')
+        PRINT('Press 3 FOR Evening Barbecue')
+        
+        INPUT choice_no
+        
+        IF(attractions[choice_no-1] == 1):
+            THEN    PRINT("Attraction Already Selected!")
+        
+        ELSE IF(choice_no == 3 AND day_choice == 1):
+            THEN    PRINT("BBQ is only available FOR 2-Day Booking")
+            
+            ELSE    attractions[choice_no-1] = 1
+
+        END IF
+              
+        IF (attractions[0] == 1 AND attractions[1] == 1 AND day_choice == 1):
+            THEN    BREAK
+
+        ELSE IF 0 NOT IN attractions:
+            BREAK
+        
+        END IF    
+        
+        INPUT extra_choice ("Do you want more Extra Attractions? Y/N:")
+    END WHILE
+    
+    ticket_price <- 0
+    attraction_price <- 0
+
+    IF(day_choice == 1)
+        THEN 
+            FOR i <- 0 TO  Length(tickets)):
+                ticket_price += tickets[i] * cost_one_day[i]
+                attraction_price += (tickets[i] * attractions[0] * att_cost[0] + tickets[i] * attractions[1] * att_cost[1]) 
+        ELSE:
+            FOR i <- 0 TO  Length(tickets)):
+                    ticket_price += tickets[i] * cost_two_day[i]
+                    attraction_price += (tickets[i] * attractions[0] * att_cost[0] + tickets[i] * attractions[1] * att_cost[1] + tickets[i] * attractions[2] * att_cost[2])
+        
+    #PRINTING DETAILS
+    PRINT("Booking No.", booking_no)
+    PRINT("Ticket Price:", ticket_price)
+    PRINT("Extra Attraction Price:", attraction_price)
+    PRINT ("Grand Total:", (ticket_price + attraction_price))
+#----------------------------------------------------------------------------------------------
+#TASK 3 STARTED
+
+    #TASK 3 IS IMPLEMENTED INSIDE TASK 2o98;l
+
+    #CALCULATING THE FAMILY TICKET AND GROUP TICKET PRICE
+    #DECLARATION
+    DECLARE family [2] : float
+    DECLARE family_rate : float
+    DECLARE tic_count : int
+    DECLARE group_rate : float
+
+    #IMPORTANT LINE
+    family <- CalculateFamilyPrice(tickets[0],tickets[1],tickets[2],day_choice) #RETURNED ARRAY!!
+    family_rate <- family [0]
+    tic_count <- family[1] 
+
+    group_rate <- CalculateGroupPrice(tickets[0],tickets[1],tickets[2],day_choice)
+    
+    
+    #IF FAMILY TICKET OFFERS THE BEST PRICE
+    IF(ticket_price > family_rate AND group_rate > family_rate):
+        PRINT ("\nBEST")
+        PRINT("Family Tickets:\nPrice:",family_rate,"- by buying",tic_count,"Family Tickets")
+        PRINT("Save on Ticket Price:",ticket_price - family_rate)
+        
+        INPUT offer_choice 
+        IF (offer_choice == 'y' OR offer_choice == 'Y'):
+            THEN    
+                ticket_price = family_rate  #PRICE SWITCHED WITH NEW
+                #PRINTING DETAILS
+                PRINT("Booking No.", booking_no)
+                PRINT("Ticket Price:", ticket_price)
+                PRINT("Extra Attraction Price:", attraction_price)
+                PRINT ("Grand Total:", (ticket_price + attraction_price))
+                
+            #IF GROUP RATE OFFERS THE BEST PRICE
+            ELSE IF (ticket_price > group_rate AND family_rate > group_rate):
+                PRINT ("\BEST OFFER:")
+                PRINT("Group Tickets:\nPrice:",group_rate)
+                PRINT("Save on Ticket Price:",ticket_price - group_rate)
+                INPUT offer_choice 
+                IF (offer_choice == 'y' OR offer_choice == 'Y'):
+                    ticket_price = group_rate # PRICE SWITCHED WITH NEW
+
+                    #PRINGTING DETAILS
+                    PRINT("Booking No.", booking_no)
+                    PRINT("Ticket Price:", ticket_price)
+                    PRINT("Extra Attraction Price:", attraction_price)
+                    PRINT ("Grand Total:", (ticket_price + attraction_price))
+
+            #INCASE NO OTHER OFFER IS PRESENT
+            ELSE
+                PRINT("No Special Offers FOR You Right Now...")
+            
+            END IF
+            
+            #TASK 3 ENDED
+    INPUT booking_choice 
+END WHILE
+
+#END OF TASK 2
+#--------------------------------------------------------------------------------------------------
